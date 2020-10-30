@@ -12,7 +12,7 @@
 	<artifactId>coronaProject</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>coronaProject</name>
-	<description>Demo project for Spring Boot</description>
+	<description>MT project</description>
 
 	<properties>
 		<java.version>11</java.version>
@@ -34,6 +34,18 @@
 					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tomcat.embed</groupId>
+			<artifactId>tomcat-embed-jasper</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet </groupId>
+			<artifactId>jstl</artifactId>
 		</dependency>
 	</dependencies>
 
