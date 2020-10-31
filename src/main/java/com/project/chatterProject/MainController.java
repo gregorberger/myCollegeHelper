@@ -1,4 +1,4 @@
-package com.project.coronaProject;
+package com.project.chatterProject;
 
 
 import org.springframework.stereotype.Controller;

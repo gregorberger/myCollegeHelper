@@ -1,10 +1,10 @@
-package com.project.coronaProject;
+package com.project.chatterProject;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CoronaProjectApplicationTests {
+class ChatterProjectApplicationTests {
 
 	@Test
 	void contextLoads() {
