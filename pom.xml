@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.project</groupId>
-	<artifactId>chatterProject</artifactId>
+	<artifactId>myCollegeHelper</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>coronaProject</name>
-	<description>TPO project</description>
+	<name>myCollegeHelper</name>
+	<description>IS project</description>
 	<packaging>war</packaging>
 
 	<properties>
@@ -59,10 +59,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>

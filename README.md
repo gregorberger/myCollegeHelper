@@ -1,4 +1,4 @@
-# chatterProject
+# myCollegeHelper
 
 Za zagon dockerjev znotraj projekta odpri terminal in vpisi:
   1. docker-compose build

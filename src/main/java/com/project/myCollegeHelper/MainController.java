@@ -1,4 +1,4 @@
-package com.project.chatterProject;
+package com.project.myCollegeHelper;
 
 
 import org.springframework.stereotype.Controller;
