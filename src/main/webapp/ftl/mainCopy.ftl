@@ -3,8 +3,6 @@
 <head>
     <title>My College Helper</title>
     <link rel="stylesheet" href="./css/bootstrap.css">
-
-
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-dark">
@@ -26,16 +24,9 @@
 </nav>
 
 <div id="mainContainer" class="container">
-    <p class="font-weight-bold">Welcome ${userName}</p>
-
     <div class="mt-4">
-        <iframe src="https://calendar.google.com/calendar/embed?height=600&amp;wkst=2&amp;bgcolor=%23ffffff&amp;ctz=Europe%2FBelgrade&amp;src=Z3JlZ29yYmVyZ2VyMTk5NzJAZ21haWwuY29t&amp;color=%23039BE5&amp;title=Calendar" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
+        <iframe src="https://calendar.google.com/calendar/embed?src=gregorberger19972%40gmail.com&ctz=Europe%2FBelgrade" style="border: 1px" width="100%" height="600" frameborder="0" scrolling="no"></iframe>
     </div>
-    <form id="foo">
-        <button type="submit">Press me!</button>
-    </form>
 </div>
-<script src="js/jquery-3.5.1.js"></script>
-<script src="js/main.js"></script>
 </body>
 </html>
