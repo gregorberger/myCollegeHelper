@@ -8,5 +8,6 @@ CREATE TABLE if not exists Data.user_info (
         last_name VARCHAR(100),
         email VARCHAR(150),
         insert_date DATE,
+        session_id VARCHAR(500),
         primary key (id)
 );

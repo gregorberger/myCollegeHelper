@@ -16,13 +16,15 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
-import org.apache.coyote.Request;
+import com.project.myCollegeHelper.entity.User;
+import com.project.myCollegeHelper.service.UserServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,10 +33,14 @@ import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @Controller
 public class MainController {
+
+    @Autowired
+    UserServiceImpl userService;
 
     private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -76,8 +82,28 @@ public class MainController {
     @GetMapping("/")
     public String main(Model model, Principal principal) {
         String userName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("name");
+        String firstName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("given_name");
+        String lastName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("family_name");
+        String email = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("email");
+        String sessionId = ((WebAuthenticationDetails)((OAuth2AuthenticationToken) principal).getDetails()).getSessionId();
+
+        logUser(firstName, lastName, email, sessionId);
+
         model.addAttribute("userName", userName);
         return "main";
+    }
+
+    private void logUser(String firstName, String lastName, String email, String sessionId) {
+        boolean userSessionExists = userService.userSessionExists(sessionId);
+        if(!userSessionExists) {
+            User user = new User();
+            user.setFirstName(firstName);
+            user.setLastName(lastName);
+            user.setEmail(email);
+            user.setInsertDate(new Date());
+            user.setSession_id(sessionId);
+            userService.insertUser(user);
+        }
     }
 
     @GetMapping("/getEvents")
