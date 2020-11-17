@@ -392,3 +392,19 @@ iframe {
         opacity:1
     }
 }
+
+.p-7 {
+    padding: 5rem !important;
+}
+
+.bg-main {
+    background-image: linear-gradient(to top, #978ecf, #8883cd, #7878cb, #656dca, #4e63c8, #3a5ebd, #2459b2, #0054a6, #0b4f8c, #1e4972, #2b4259, #343a40) !important;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #33606e !important;
+}
+
+.main-color {
+    color: #33606e !important;
+}
