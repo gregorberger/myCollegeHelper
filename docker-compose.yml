@@ -1,9 +1,10 @@
 version: "3.8"
 services:
-  webapp:
-    build: ./
-    ports:
-      - "8080:8080"
+
+ # webapp:
+ #   build: ./
+ #   ports:
+ #    - "8080:8080"
 
   db:
     image: mysql

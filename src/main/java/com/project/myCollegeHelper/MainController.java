@@ -18,6 +18,9 @@ import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.project.myCollegeHelper.entity.User;
 import com.project.myCollegeHelper.service.UserServiceImpl;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -26,14 +29,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
 
 @Controller
@@ -78,9 +80,113 @@ public class MainController {
     }
 
 
+    private static void setOdlozisce() {
+        Clipboard odlozisce = Toolkit.getDefaultToolkit().getSystemClipboard();
+        odlozisce.setContents(new StringSelection("@"), null);
+    }
+
+
+    private static int mesecVStevilo(String NapisanMesec) {
+        String[] meseci = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Avg", "Sep", "Oct", "Nov", "Dec"};
+        for (int i=0; i<11; i++) {
+            if (NapisanMesec.equals(meseci[i]))
+                return i+1;
+        }
+        return -1;
+    }
+
+
+    /**
+     * Metoda ki vrne ArrayList predmetnika in ocen.
+     * Kliče se v zažetku programa samo 1x in si shrani v spremenljivko.
+     * Metodo moramo klicati preden kličemo metodo getDogodki!
+     */
+    private static TreeMap<String, String> getPredmetiInOcene(WebDriver chrome) {
+        chrome.get("https://ucilnica.fri.uni-lj.si/grade/report/overview/index.php");
+        TreeMap<String, String> predmetnik = new TreeMap<>();
+
+        for (String vrstica : chrome.getPageSource().split("\n")) {
+            if (vrstica.contains("Predmeti, ki jih obiskujem")) {
+                for (String x : vrstica.split("a href=\""))
+                    if (x.contains("https"))
+                        predmetnik.put(
+                                x.substring(x.indexOf('>') + 1       , x.indexOf('<')),
+                                x.substring(x.indexOf("\">", 110) + 2, x.indexOf("</td></tr><tr")));
+                break;
+            }
+        }
+        return predmetnik;
+    }
+
+    /**
+     * Metoda uporabi parameter in potegne podatke iz spleta
+     * Namenjena je, da se kliče samo 1x v programu
+     * @param chrome Webdriver da lahko pridobimo podatke iz spleta
+     * @return vrne String[][] z dogodki
+     */
+    public static String[][] getDogodki(WebDriver chrome) {
+        chrome.get("https://ucilnica.fri.uni-lj.si/calendar/view.php?view=upcoming");
+        String[][] dogodki = new String[100][3];
+        int i = 0;
+
+        for (String vrstica : chrome.getPageSource().split("\n")) {
+            if (vrstica.contains("<a id=\"calendar-day-popover-link"))
+                break;
+            if (vrstica.contains("name d-inline-block"))
+                dogodki[i][0] = vrstica.substring(vrstica.indexOf('>') + 1, vrstica.indexOf("</h3>"));
+
+            else if (vrstica.contains("view=day&amp")) {
+                // če google omogoča unix time, lahko izbrišem spodnji dve vrstici
+                long unixCas = Long.parseLong(vrstica.substring(vrstica.indexOf("time=") + 5, vrstica.indexOf('"', 60)));
+                String cloveskiFormatCasa = new java.util.Date(unixCas * 1000).toString();
+
+                dogodki[i][1] = String.format("%s.%d.%s", cloveskiFormatCasa.substring(8, 10),
+                        mesecVStevilo(cloveskiFormatCasa.substring(4, 7)), cloveskiFormatCasa.substring(24));
+
+            } else if (vrstica.contains("a href=\"https://ucilnica.fri.uni-lj.si/course"))
+                dogodki[i++][2] = vrstica.substring(vrstica.indexOf("\">", 60) + 2, vrstica.indexOf("</a>"));
+        }
+
+        chrome.quit();
+        return dogodki;
+    }
+
+
+    public static WebDriver VpisNaUcilnico(String mail, String geslo, String potDoEXEdatoteke) {
+        setOdlozisce();
+        System.setProperty("webdriver.chrome.driver", potDoEXEdatoteke);
+        WebDriver chrome = new ChromeDriver();
+
+        chrome.get("https://ucilnica.fri.uni-lj.si/login/index.php");
+        chrome.findElement(By.id("username")).sendKeys(mail);
+        chrome.findElement(By.id("password")).sendKeys(geslo);
+
+        chrome.findElement(By.id("loginbtn")).click();
+        return chrome;
+    }
+
+
+    public static ArrayList<String> getPredmeti(TreeMap<String, String> predmetiInOcene) {
+        ArrayList<String> predmeti = new ArrayList<>();
+
+        for (Map.Entry<String, String> x : predmetiInOcene.entrySet())
+            predmeti.add(x.getKey());
+        return predmeti;
+    }
+
+
+    public static ArrayList<String> getOcene(TreeMap<String, String> predmetiInOcene) {
+        ArrayList<String> ocene = new ArrayList<>();
+
+        for (Map.Entry<String, String> x : predmetiInOcene.entrySet())
+            ocene.add(x.getValue());
+        return ocene;
+    }
+
+
 
     @GetMapping("/")
-    public String main(Model model, Principal principal) {
+    public String main(Model model, Principal principal) throws IOException {
         String userName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("name");
         String firstName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("given_name");
         String lastName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("family_name");
@@ -90,8 +196,27 @@ public class MainController {
         logUser(firstName, lastName, email, sessionId);
 
         model.addAttribute("userName", userName);
+
+
+        /*
+        WebDriver chrome = VpisNaUcilnico("mail_za_ucilnico", "geslo_za_ucilnico",
+                new File("./ChromeDriver").getCanonicalPath() + "\\chromedriver.exe");
+
+        TreeMap<String, String> predmetiInOcene = getPredmetiInOcene(chrome);
+
+        // končni dogodki za uporabo
+        String[][] dogodki = getDogodki(chrome);
+
+        // končni predmeti za uporabo
+        ArrayList<String> predmeti = getPredmeti(predmetiInOcene);
+        // končne ocene za uporabo
+        ArrayList<String> ocene = getOcene(predmetiInOcene);
+         */
+
+
         return "main";
     }
+
 
     private void logUser(String firstName, String lastName, String email, String sessionId) {
         boolean userSessionExists = userService.userSessionExists(sessionId);
@@ -105,6 +230,7 @@ public class MainController {
             userService.insertUser(user);
         }
     }
+
 
     @GetMapping("/getEvents")
     public ResponseEntity<String> getEvents() throws GeneralSecurityException, IOException {
