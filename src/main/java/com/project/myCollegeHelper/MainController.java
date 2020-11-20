@@ -28,6 +28,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -37,6 +39,8 @@ import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.util.*;
 import java.util.List;
+
+import static org.springframework.web.bind.annotation.RequestMethod.GET;
 
 @Controller
 public class MainController {
@@ -196,6 +200,7 @@ public class MainController {
         logUser(firstName, lastName, email, sessionId);
 
         model.addAttribute("userName", userName);
+        model.addAttribute("email", email);
 
 
         /*
@@ -214,9 +219,9 @@ public class MainController {
          */
 
 
+
         return "main";
     }
-
 
     private void logUser(String firstName, String lastName, String email, String sessionId) {
         boolean userSessionExists = userService.userSessionExists(sessionId);
@@ -230,7 +235,6 @@ public class MainController {
             userService.insertUser(user);
         }
     }
-
 
     @GetMapping("/getEvents")
     public ResponseEntity<String> getEvents() throws GeneralSecurityException, IOException {
@@ -265,9 +269,13 @@ public class MainController {
         return ResponseEntity.ok("neki");
     }
 
-    @GetMapping("/bye")
-    public String bye(Model model){
-        model.addAttribute("ime", "ekipa");
-        return "bye";
+    @RequestMapping(value = "/subject/{subjectName}", method = GET)
+    public String getSubjectNotes(@PathVariable("subjectName") String subjectName, Model model, Principal principal){
+        String userName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("name");
+        String email = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("email");
+
+        model.addAttribute("userName", userName);
+        model.addAttribute("email", email);
+        return "subjectNotes";
     }
 }
