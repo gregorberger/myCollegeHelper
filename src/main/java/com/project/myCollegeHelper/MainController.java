@@ -14,8 +14,8 @@ import com.google.api.client.util.DateTime;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
+import com.google.api.services.calendar.model.*;
 import com.google.api.services.calendar.model.Event;
-import com.google.api.services.calendar.model.Events;
 import com.project.myCollegeHelper.entity.User;
 import com.project.myCollegeHelper.service.UserServiceImpl;
 import org.openqa.selenium.By;
@@ -41,7 +41,6 @@ import java.util.*;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
-
 @Controller
 public class MainController {
 
@@ -84,15 +83,32 @@ public class MainController {
     }
 
 
+    private static String imeInPriimek;
+
     private static void setOdlozisce() {
         Clipboard odlozisce = Toolkit.getDefaultToolkit().getSystemClipboard();
         odlozisce.setContents(new StringSelection("@"), null);
     }
 
+    /**
+     * Preden kličeš to metodo moraš poklicat getPredmetiInOcene()
+     * @return
+     */
+    public static String getOsnovnePodatke() {
+        if (imeInPriimek.equals(""))
+            return imeInPriimek;
+        return imeInPriimek.substring(imeInPriimek.indexOf("<h1>") + 4, imeInPriimek.indexOf("</h1>"));
+    }
+
+
+    public static void quitWebDriver(WebDriver chrome) {
+        chrome.quit();
+    }
+
 
     private static int mesecVStevilo(String NapisanMesec) {
         String[] meseci = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Avg", "Sep", "Oct", "Nov", "Dec"};
-        for (int i=0; i<11; i++) {
+        for (int i=0; i<12; i++) {
             if (NapisanMesec.equals(meseci[i]))
                 return i+1;
         }
@@ -103,13 +119,15 @@ public class MainController {
     /**
      * Metoda ki vrne ArrayList predmetnika in ocen.
      * Kliče se v zažetku programa samo 1x in si shrani v spremenljivko.
-     * Metodo moramo klicati preden kličemo metodo getDogodki!
+     * To metodo moraš poklicat da dobiš ime in priimek
      */
     private static TreeMap<String, String> getPredmetiInOcene(WebDriver chrome) {
         chrome.get("https://ucilnica.fri.uni-lj.si/grade/report/overview/index.php");
         TreeMap<String, String> predmetnik = new TreeMap<>();
 
         for (String vrstica : chrome.getPageSource().split("\n")) {
+            if (vrstica.contains("page-header-headings"))
+                imeInPriimek = vrstica;
             if (vrstica.contains("Predmeti, ki jih obiskujem")) {
                 for (String x : vrstica.split("a href=\""))
                     if (x.contains("https"))
@@ -151,7 +169,6 @@ public class MainController {
                 dogodki[i++][2] = vrstica.substring(vrstica.indexOf("\">", 60) + 2, vrstica.indexOf("</a>"));
         }
 
-        chrome.quit();
         return dogodki;
     }
 
@@ -187,6 +204,59 @@ public class MainController {
         return ocene;
     }
 
+    /**
+     * Work in progress
+     * @param naslov
+     * @param predmet
+     * @param ura
+     * @throws IOException
+     * @throws GeneralSecurityException
+     */
+    public static void ustvariDogodekVKoledarju(String naslov, String predmet, String ura) throws IOException, GeneralSecurityException {
+        // Build a new authorized API client service.
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+
+        Event event = new Event()
+                .setSummary(naslov)
+                .setDescription(predmet);
+
+        DateTime uraZacetkaDogodka = new DateTime(ura);
+        EventDateTime zacetek = new EventDateTime()
+                .setDateTime(uraZacetkaDogodka)
+                .setTimeZone("America/Los_Angeles");;
+        event.setStart(zacetek);
+
+        DateTime uraKoncaDogodka = new DateTime(ura);
+        EventDateTime konec = new EventDateTime()
+                .setDateTime(uraKoncaDogodka)
+                .setTimeZone("America/Los_Angeles");;
+        event.setEnd(konec);
+
+        /*EventAttendee[] attendees = new EventAttendee[] {
+                new EventAttendee().setEmail("lpage@example.com"),
+                new EventAttendee().setEmail("sbrin@example.com"),
+        };
+        event.setAttendees(Arrays.asList(attendees));
+
+
+        EventReminder[] reminderOverrides = new EventReminder[] {
+                new EventReminder().setMethod("email").setMinutes(24 * 60),
+                new EventReminder().setMethod("popup").setMinutes(10),
+        };
+        Event.Reminders reminders = new Event.Reminders()
+                .setUseDefault(false)
+                .setOverrides(Arrays.asList(reminderOverrides));
+        event.setReminders(reminders);
+         */
+
+        String calendarId = "primary";
+        event = service.events().insert(calendarId, event).execute();
+        System.out.printf("Event created: %s\n", event.getHtmlLink());
+    }
+
 
 
     @GetMapping("/")
@@ -203,22 +273,20 @@ public class MainController {
         model.addAttribute("email", email);
 
 
-        /*
+
         WebDriver chrome = VpisNaUcilnico("mail_za_ucilnico", "geslo_za_ucilnico",
                 new File("./ChromeDriver").getCanonicalPath() + "\\chromedriver.exe");
 
         TreeMap<String, String> predmetiInOcene = getPredmetiInOcene(chrome);
-
         // končni dogodki za uporabo
         String[][] dogodki = getDogodki(chrome);
-
         // končni predmeti za uporabo
         ArrayList<String> predmeti = getPredmeti(predmetiInOcene);
         // končne ocene za uporabo
         ArrayList<String> ocene = getOcene(predmetiInOcene);
-         */
+        String imePriimek = getOsnovnePodatke();
 
-
+        quitWebDriver(chrome);
 
         return "main";
     }
