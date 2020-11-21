@@ -16,7 +16,8 @@ import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.*;
 import com.google.api.services.calendar.model.Event;
-import com.project.myCollegeHelper.entity.User;
+import com.project.myCollegeHelper.entity.*;
+import com.project.myCollegeHelper.service.StudentServiceImpl;
 import com.project.myCollegeHelper.service.UserServiceImpl;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -41,11 +42,18 @@ import java.util.*;
 import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
+
 @Controller
 public class MainController {
 
+    String studentEmail;
+    Integer studentId;
+
     @Autowired
     UserServiceImpl userService;
+
+    @Autowired
+    StudentServiceImpl studentService;
 
     private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
@@ -273,7 +281,7 @@ public class MainController {
         model.addAttribute("email", email);
 
 
-
+        /*
         WebDriver chrome = VpisNaUcilnico("mail_za_ucilnico", "geslo_za_ucilnico",
                 new File("./ChromeDriver").getCanonicalPath() + "\\chromedriver.exe");
 
@@ -286,7 +294,34 @@ public class MainController {
         ArrayList<String> ocene = getOcene(predmetiInOcene);
         String imePriimek = getOsnovnePodatke();
 
-        quitWebDriver(chrome);
+        quitWebDriver(chrome); */
+
+
+        // TODO: to se zgodi ko se vpise v račun eUčilnice
+        StudentsEntity student = new StudentsEntity();
+        student.setName("Gregor");
+        student.setLastName("Berger");
+        student.setEmail("gb5811@student.uni.lj.si");
+        StudentsEntity studentsEntity = studentService.getStudentByEmail("gb5811@student.uni.lj.si");
+
+        studentId = studentsEntity.getSid();
+        studentEmail = studentsEntity.getEmail();
+
+        studentService.insertStudent(student);
+
+        // Tuki gre ces vse predmete in jih vnese (treba for zanko nardit)
+        SubjectsEntity subject = new SubjectsEntity();
+        subject.setName("Informacijski sistemi");
+        studentService.insertSubject(subject);
+
+
+        // Tudi se za ocene (more for zanka tut bit)
+        GradesEntity gradesEntity = new GradesEntity();
+        gradesEntity.setStudentId(studentId);
+        SubjectsEntity subjectsEntity = studentService.getSubject("Informacijski sistemi");
+        gradesEntity.setSubjectId(subjectsEntity.getSubid());
+        gradesEntity.setGrade("10");
+        studentService.insertGrade(gradesEntity);
 
         return "main";
     }
@@ -338,12 +373,37 @@ public class MainController {
     }
 
     @RequestMapping(value = "/subject/{subjectName}", method = GET)
-    public String getSubjectNotes(@PathVariable("subjectName") String subjectName, Model model, Principal principal){
-        String userName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("name");
-        String email = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("email");
+    public String getSubjectNotes(@PathVariable("subjectName") String subjectName, Model model){
+        model.addAttribute("subjectName", subjectName);
 
-        model.addAttribute("userName", userName);
-        model.addAttribute("email", email);
+        SubjectsEntity subjectsEntity = studentService.getSubject(subjectName);
+        String subjectId = String.valueOf(subjectsEntity.getSubid());
+        model.addAttribute("notesList", studentService.getNotes(studentId.toString(), subjectId));
+
+        model.addAttribute("totalGrade", studentService.getGrade(studentId.toString(), subjectId).getGrade());
+
         return "subjectNotes";
+    }
+
+    @GetMapping("/subject/insertNote")
+    public ResponseEntity<SubjectNotesEntity> insertNote(String title, String noteText, String subjectName){
+
+        StudentsEntity studentsEntity = studentService.getStudentByEmail(studentEmail);
+        SubjectsEntity subjectsEntity = studentService.getSubject(subjectName);
+
+        SubjectNotesEntity subjectNotesEntity = new SubjectNotesEntity();
+        subjectNotesEntity.setTitle(title);
+        subjectNotesEntity.setNotes(noteText);
+        subjectNotesEntity.setStudentId(studentsEntity.getSid());
+        subjectNotesEntity.setSubjectId(subjectsEntity.getSubid());
+
+        studentService.insertSubjectNote(subjectNotesEntity);
+
+        return ResponseEntity.ok(subjectNotesEntity);
+    }
+
+    @GetMapping("/subject/loadNote")
+    public ResponseEntity<SubjectNotesEntity> loadNote(String noteId){
+        return ResponseEntity.ok(studentService.getNote(noteId));
     }
 }
