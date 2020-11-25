@@ -19,12 +19,8 @@ $(function() {
             dataType: 'json',
             data: data,
             success: function(data) {
+                console.log("rr");
                 location.reload();
-                if(data.username != null){
-                    location.reload();
-                } else {
-                    document.getElementById("incorrectInput").classList.remove("collapse");
-                }
             }
         });
     });

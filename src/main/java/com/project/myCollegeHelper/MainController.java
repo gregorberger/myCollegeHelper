@@ -194,30 +194,33 @@ public class MainController {
     public static String ustvariDogodekVKoledarju(String naslov, String datumUra, String predmet)
             throws IOException, GeneralSecurityException {
 
-        // Build a new authorized API client service.
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                .setApplicationName(APPLICATION_NAME)
-                .build();
+        if (datumUra != null) {
+            // Build a new authorized API client service.
+            final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+            Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                    .setApplicationName(APPLICATION_NAME)
+                    .build();
 
-        Event event = new Event()
-                .setSummary(naslov)
-                .setDescription(predmet);
+            Event event = new Event()
+                    .setSummary(naslov)
+                    .setDescription(predmet);
 
-        DateTime uraZacetkaDogodka = new DateTime(datumUra);
-        EventDateTime zacetek = new EventDateTime()
-                .setDateTime(uraZacetkaDogodka);
-        event.setStart(zacetek);
+            DateTime uraZacetkaDogodka = new DateTime(datumUra);
+            EventDateTime zacetek = new EventDateTime()
+                    .setDateTime(uraZacetkaDogodka);
+            event.setStart(zacetek);
 
-        DateTime uraKoncaDogodka = new DateTime(datumUra);
-        EventDateTime konec = new EventDateTime()
-                .setDateTime(uraKoncaDogodka);
-        event.setEnd(konec);
+            DateTime uraKoncaDogodka = new DateTime(datumUra);
+            EventDateTime konec = new EventDateTime()
+                    .setDateTime(uraKoncaDogodka);
+            event.setEnd(konec);
 
 
-        String calendarId = "primary";
-        event = service.events().insert(calendarId, event).execute();
-        return String.format("Event created: %s\n", event.getHtmlLink());
+            String calendarId = "primary";
+            event = service.events().insert(calendarId, event).execute();
+            return String.format("Event created: %s\n", event.getHtmlLink());
+        }
+        return null;
     }
 
 
@@ -297,7 +300,7 @@ public class MainController {
         return "main";
     }
 
-    private void logUser(String firstName, String lastName, String email, String sessionId) {
+    private void logUser(String firstName, String lastName, String email, String sessionId) throws IOException, GeneralSecurityException {
         boolean userSessionExists = userService.userSessionExists(sessionId);
         if(!userSessionExists) {
             User user = new User();
@@ -307,6 +310,10 @@ public class MainController {
             user.setInsertDate(new Date());
             user.setSession_id(sessionId);
             userService.insertUser(user);
+
+            pobrisiDogodke();
+            if(predmeti != null)
+                predmeti.clear();
         }
     }
 
@@ -336,10 +343,9 @@ public class MainController {
 
         quitWebDriver(chrome);
 
-        pobrisiDogodke();
-
-        //for (String[] dogodek : dogodki)
-            ustvariDogodekVKoledarju(dogodki[0][0], dogodki[0][1], dogodki[0][2]);
+        for (int i = 0; i < dogodki.length - 1; i++) {
+            ustvariDogodekVKoledarju(dogodki[i][0], dogodki[i][1], dogodki[i][2]);
+        }
 
 
         // Delo z bazo
