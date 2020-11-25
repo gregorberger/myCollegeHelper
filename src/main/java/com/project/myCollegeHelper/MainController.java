@@ -28,9 +28,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
@@ -38,6 +36,7 @@ import java.awt.datatransfer.StringSelection;
 import java.io.*;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 
@@ -55,23 +54,15 @@ public class MainController {
     @Autowired
     StudentServiceImpl studentService;
 
-    private static final String APPLICATION_NAME = "Google Calendar API Java Quickstart";
+    private static final String APPLICATION_NAME = "myCollegeHelper";
     private static final JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "tokens";
 
-    /**
-     * Global instance of the scopes required by this quickstart.
-     * If modifying these scopes, delete your previously saved tokens/ folder.
-     */
-    private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR_READONLY);
+
+    private static final List<String> SCOPES = Collections.singletonList(CalendarScopes.CALENDAR);
     private static final String CREDENTIALS_FILE_PATH = "/credentials.json";
 
-    /**
-     * Creates an authorized Credential object.
-     * @param HTTP_TRANSPORT The network HTTP Transport.
-     * @return An authorized Credential object.
-     * @throws IOException If the credentials.json file cannot be found.
-     */
+
     private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT) throws IOException {
         // Load client secrets.
         InputStream in = LoginController.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
@@ -100,7 +91,6 @@ public class MainController {
 
     /**
      * Preden kličeš to metodo moraš poklicat getPredmetiInOcene()
-     * @return
      */
     public static String getOsnovnePodatke() {
         if (imeInPriimek.equals(""))
@@ -111,16 +101,6 @@ public class MainController {
 
     public static void quitWebDriver(WebDriver chrome) {
         chrome.quit();
-    }
-
-
-    private static int mesecVStevilo(String NapisanMesec) {
-        String[] meseci = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Avg", "Sep", "Oct", "Nov", "Dec"};
-        for (int i=0; i<12; i++) {
-            if (NapisanMesec.equals(meseci[i]))
-                return i+1;
-        }
-        return -1;
     }
 
 
@@ -149,7 +129,6 @@ public class MainController {
     }
 
     /**
-     * Metoda uporabi parameter in potegne podatke iz spleta
      * Namenjena je, da se kliče samo 1x v programu
      * @param chrome Webdriver da lahko pridobimo podatke iz spleta
      * @return vrne String[][] z dogodki
@@ -166,12 +145,9 @@ public class MainController {
                 dogodki[i][0] = vrstica.substring(vrstica.indexOf('>') + 1, vrstica.indexOf("</h3>"));
 
             else if (vrstica.contains("view=day&amp")) {
-                // če google omogoča unix time, lahko izbrišem spodnji dve vrstici
                 long unixCas = Long.parseLong(vrstica.substring(vrstica.indexOf("time=") + 5, vrstica.indexOf('"', 60)));
-                String cloveskiFormatCasa = new java.util.Date(unixCas * 1000).toString();
-
-                dogodki[i][1] = String.format("%s.%d.%s", cloveskiFormatCasa.substring(8, 10),
-                        mesecVStevilo(cloveskiFormatCasa.substring(4, 7)), cloveskiFormatCasa.substring(24));
+                dogodki[i][1] = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX")
+                        .format(new java.util.Date(unixCas * 1000));
 
             } else if (vrstica.contains("a href=\"https://ucilnica.fri.uni-lj.si/course"))
                 dogodki[i++][2] = vrstica.substring(vrstica.indexOf("\">", 60) + 2, vrstica.indexOf("</a>"));
@@ -186,6 +162,7 @@ public class MainController {
         System.setProperty("webdriver.chrome.driver", potDoEXEdatoteke);
         WebDriver chrome = new ChromeDriver();
 
+        chrome.manage().window().maximize();
         chrome.get("https://ucilnica.fri.uni-lj.si/login/index.php");
         chrome.findElement(By.id("username")).sendKeys(mail);
         chrome.findElement(By.id("password")).sendKeys(geslo);
@@ -212,15 +189,11 @@ public class MainController {
         return ocene;
     }
 
-    /**
-     * Work in progress
-     * @param naslov
-     * @param predmet
-     * @param ura
-     * @throws IOException
-     * @throws GeneralSecurityException
-     */
-    public static void ustvariDogodekVKoledarju(String naslov, String predmet, String ura) throws IOException, GeneralSecurityException {
+
+
+    public static String ustvariDogodekVKoledarju(String naslov, String datumUra, String predmet)
+            throws IOException, GeneralSecurityException {
+
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
@@ -231,44 +204,85 @@ public class MainController {
                 .setSummary(naslov)
                 .setDescription(predmet);
 
-        DateTime uraZacetkaDogodka = new DateTime(ura);
+        DateTime uraZacetkaDogodka = new DateTime(datumUra);
         EventDateTime zacetek = new EventDateTime()
-                .setDateTime(uraZacetkaDogodka)
-                .setTimeZone("America/Los_Angeles");;
+                .setDateTime(uraZacetkaDogodka);
         event.setStart(zacetek);
 
-        DateTime uraKoncaDogodka = new DateTime(ura);
+        DateTime uraKoncaDogodka = new DateTime(datumUra);
         EventDateTime konec = new EventDateTime()
-                .setDateTime(uraKoncaDogodka)
-                .setTimeZone("America/Los_Angeles");;
+                .setDateTime(uraKoncaDogodka);
         event.setEnd(konec);
 
-        /*EventAttendee[] attendees = new EventAttendee[] {
-                new EventAttendee().setEmail("lpage@example.com"),
-                new EventAttendee().setEmail("sbrin@example.com"),
-        };
-        event.setAttendees(Arrays.asList(attendees));
-
-
-        EventReminder[] reminderOverrides = new EventReminder[] {
-                new EventReminder().setMethod("email").setMinutes(24 * 60),
-                new EventReminder().setMethod("popup").setMinutes(10),
-        };
-        Event.Reminders reminders = new Event.Reminders()
-                .setUseDefault(false)
-                .setOverrides(Arrays.asList(reminderOverrides));
-        event.setReminders(reminders);
-         */
 
         String calendarId = "primary";
         event = service.events().insert(calendarId, event).execute();
-        System.out.printf("Event created: %s\n", event.getHtmlLink());
+        return String.format("Event created: %s\n", event.getHtmlLink());
+    }
+
+
+    public static void pobrisiDogodke() throws IOException, GeneralSecurityException {
+        // Build a new authorized API client service.
+        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
+        Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                .setApplicationName(APPLICATION_NAME)
+                .build();
+
+
+        // Poglej v koledar, če so kakšni dogodki in jih pobriši
+        DateTime now = new DateTime(System.currentTimeMillis());
+        Events events = service.events().list("primary")
+                .setTimeMin(now)
+                .setOrderBy("startTime")
+                .setSingleEvents(true)
+                .execute();
+        for (Event event : events.getItems())
+            service.events().delete("primary", event.getId()).execute();
+    }
+
+
+    public void baza(String ime, String priimek, String userName, ArrayList<String> predmeti, ArrayList<String> ocene) {
+        StudentsEntity student = new StudentsEntity();
+        student.setName(ime);
+        student.setLastName(priimek);
+        student.setEmail(userName);
+        StudentsEntity studentsEntity = studentService.getStudentByEmail(userName);
+
+        if (studentsEntity == null) {           //pomeni da mora biti insertan v bazo
+            studentService.insertStudent(student);
+            studentsEntity = studentService.getStudentByEmail(userName);
+
+            studentId = studentsEntity.getSid();
+            studentEmail = studentsEntity.getEmail();
+
+
+            // Tuki gre ces vse predmete in jih vnese
+            for (String predmet : predmeti) {
+                SubjectsEntity subject = new SubjectsEntity();
+                subject.setName(predmet);
+                studentService.insertSubject(subject);
+            }
+
+
+            // Tudi se za ocene
+            for (int i = 0; i < ocene.size(); i++) {
+                GradesEntity gradesEntity = new GradesEntity();
+                gradesEntity.setStudentId(studentId);
+                SubjectsEntity subjectsEntity = studentService.getSubject(predmeti.get(i));
+                gradesEntity.setSubjectId(subjectsEntity.getSubid());
+                gradesEntity.setGrade(ocene.get(i));
+                studentService.insertGrade(gradesEntity);
+            }
+        } else {
+            studentId = studentsEntity.getSid();
+            studentEmail = studentsEntity.getEmail();
+        }
     }
 
 
 
     @GetMapping("/")
-    public String main(Model model, Principal principal) throws IOException {
+    public String main(Model model, Principal principal) throws IOException, GeneralSecurityException {
         String userName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("name");
         String firstName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("given_name");
         String lastName = ((OAuth2AuthenticationToken) principal).getPrincipal().getAttribute("family_name");
@@ -279,49 +293,6 @@ public class MainController {
 
         model.addAttribute("userName", userName);
         model.addAttribute("email", email);
-
-
-        /*
-        WebDriver chrome = VpisNaUcilnico("mail_za_ucilnico", "geslo_za_ucilnico",
-                new File("./ChromeDriver").getCanonicalPath() + "\\chromedriver.exe");
-
-        TreeMap<String, String> predmetiInOcene = getPredmetiInOcene(chrome);
-        // končni dogodki za uporabo
-        String[][] dogodki = getDogodki(chrome);
-        // končni predmeti za uporabo
-        ArrayList<String> predmeti = getPredmeti(predmetiInOcene);
-        // končne ocene za uporabo
-        ArrayList<String> ocene = getOcene(predmetiInOcene);
-        String imePriimek = getOsnovnePodatke();
-
-        quitWebDriver(chrome); */
-
-
-        // TODO: to se zgodi ko se vpise v račun eUčilnice
-        StudentsEntity student = new StudentsEntity();
-        student.setName("Gregor");
-        student.setLastName("Berger");
-        student.setEmail("gb5811@student.uni.lj.si");
-        StudentsEntity studentsEntity = studentService.getStudentByEmail("gb5811@student.uni.lj.si");
-
-        studentId = studentsEntity.getSid();
-        studentEmail = studentsEntity.getEmail();
-
-        studentService.insertStudent(student);
-
-        // Tuki gre ces vse predmete in jih vnese (treba for zanko nardit)
-        SubjectsEntity subject = new SubjectsEntity();
-        subject.setName("Informacijski sistemi");
-        studentService.insertSubject(subject);
-
-
-        // Tudi se za ocene (more for zanka tut bit)
-        GradesEntity gradesEntity = new GradesEntity();
-        gradesEntity.setStudentId(studentId);
-        SubjectsEntity subjectsEntity = studentService.getSubject("Informacijski sistemi");
-        gradesEntity.setSubjectId(subjectsEntity.getSubid());
-        gradesEntity.setGrade("10");
-        studentService.insertGrade(gradesEntity);
 
         return "main";
     }
@@ -339,38 +310,50 @@ public class MainController {
         }
     }
 
-    @GetMapping("/getEvents")
-    public ResponseEntity<String> getEvents() throws GeneralSecurityException, IOException {
 
-        // Build a new authorized API client service.
-        final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Calendar service = new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
-                .setApplicationName(APPLICATION_NAME)
-                .build();
+    ArrayList<String> predmeti;
 
-        // List the next 10 events from the primary calendar.
-        DateTime now = new DateTime(System.currentTimeMillis());
-        Events events = service.events().list("primary")
-                .setMaxResults(10)
-                .setTimeMin(now)
-                .setOrderBy("startTime")
-                .setSingleEvents(true)
-                .execute();
-        List<Event> items = events.getItems();
-        if (items.isEmpty()) {
-            System.out.println("No upcoming events found.");
-        } else {
-            System.out.println("Upcoming events");
-            for (Event event : items) {
-                DateTime start = event.getStart().getDateTime();
-                if (start == null) {
-                    start = event.getStart().getDate();
-                }
-                System.out.printf("%s (%s)\n", event.getSummary(), start);
-            }
-        }
-        return ResponseEntity.ok("neki");
+    @GetMapping("/getVpis")
+    public ResponseEntity<String> deloSPodatki(String userName, String password) throws IOException, GeneralSecurityException {
+        WebDriver chrome = VpisNaUcilnico(userName, password,
+                new File("./ChromeDriver").getCanonicalPath() + "\\chromedriver.exe");
+
+        TreeMap<String, String> predmetiInOcene = getPredmetiInOcene(chrome);
+
+        // končni predmeti za uporabo
+        predmeti = getPredmeti(predmetiInOcene);
+
+        // končne ocene za uporabo
+        ArrayList<String> ocene = getOcene(predmetiInOcene);
+
+        // končni dogodki za uporabo
+        String[][] dogodki = getDogodki(chrome);
+
+        String[] imePriimekSplit = getOsnovnePodatke().split(" ");
+        String ime = imePriimekSplit[0];
+        String priimek = imePriimekSplit[1];
+
+
+        quitWebDriver(chrome);
+
+        pobrisiDogodke();
+
+        //for (String[] dogodek : dogodki)
+            ustvariDogodekVKoledarju(dogodki[0][0], dogodki[0][1], dogodki[0][2]);
+
+
+        // Delo z bazo
+        baza(ime, priimek, userName, predmeti, ocene);
+
+        return ResponseEntity.ok("povratek");
     }
+
+
+    @ModelAttribute
+    public void predmeti(Model model){
+        model.addAttribute("predmeti", predmeti);
+    }
+
 
     @RequestMapping(value = "/subject/{subjectName}", method = GET)
     public String getSubjectNotes(@PathVariable("subjectName") String subjectName, Model model){
@@ -384,6 +367,7 @@ public class MainController {
 
         return "subjectNotes";
     }
+
 
     @GetMapping("/subject/insertNote")
     public ResponseEntity<SubjectNotesEntity> insertNote(String title, String noteText, String subjectName){
@@ -401,6 +385,7 @@ public class MainController {
 
         return ResponseEntity.ok(subjectNotesEntity);
     }
+
 
     @GetMapping("/subject/loadNote")
     public ResponseEntity<SubjectNotesEntity> loadNote(String noteId){

@@ -1,31 +1,36 @@
-// Bind to the submit event of our form
-$("#foo").submit(function(event){
+$(function() {
+    $("#vpis_v_ucilnico").submit(function(e) {
 
-    // Prevent default posting of form - put here to work in case of errors
-    event.preventDefault();
+        var userName = document.getElementById("ucilnica_mail").value;
+        var password = document.getElementById("ucilnica_geslo").value;
 
-    // Fire off the request
-    request = $.ajax({
-        url: "/getEvents",
-        type: "get",
+        var data = {
+            "userName": userName,
+            "password": password
+        };
+
+        //prevent Default functionality
+        e.preventDefault();
+
+        //do your own request an handle the results
+        $.ajax({
+            url: "/getVpis",
+            type: 'get',
+            dataType: 'json',
+            data: data,
+            success: function(data) {
+                location.reload();
+                if(data.username != null){
+                    location.reload();
+                } else {
+                    document.getElementById("incorrectInput").classList.remove("collapse");
+                }
+            }
+        });
     });
-
-    // Callback handler that will be called on success
-    // request.done(function (response, textStatus, jqXHR){
-    //     // Log a message to the console
-    //     console.log("Hooray, it worked!");
-    // });
-
-    // Callback handler that will be called on failure
-    // request.fail(function (jqXHR, textStatus, errorThrown){
-    //     // Log the error to the console
-    //     console.error(
-    //         "The following error occurred: "+
-    //         textStatus, errorThrown
-    //     );
-    // });
-
 });
+
+
 
 $(function() {
     $("#paper").submit(function(e) {

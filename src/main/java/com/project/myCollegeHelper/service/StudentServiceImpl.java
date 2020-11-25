@@ -35,8 +35,13 @@ public class StudentServiceImpl extends JdbcDaoSupport implements StudentService
     @Override
     public StudentsEntity getStudentByEmail(String email) {
         String sql = "select * from students where email = ?";
-        return (StudentsEntity) getJdbcTemplate().queryForObject(sql,new Object[]{email},
-                new StudentRowMapper());
+        StudentsEntity podatki;
+        try {
+             podatki = getJdbcTemplate().queryForObject(sql, new Object[]{email}, new StudentRowMapper());
+        } catch (Exception e) {
+            podatki = null;
+        }
+        return podatki;
     }
 
     @Override
