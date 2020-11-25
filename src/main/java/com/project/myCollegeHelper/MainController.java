@@ -338,8 +338,8 @@ public class MainController {
 
         pobrisiDogodke();
 
-        //for (String[] dogodek : dogodki)
-            ustvariDogodekVKoledarju(dogodki[0][0], dogodki[0][1], dogodki[0][2]);
+        for (String[] dogodek : dogodki)
+            ustvariDogodekVKoledarju(dogodek[0], dogodek[1], dogodek[2]);
 
 
         // Delo z bazo
