@@ -1,0 +1,3 @@
+baza na Azure db:
+user: sudo@mycollegehelper-mysqldb
+pass: seminarska1!
