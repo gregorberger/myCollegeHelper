@@ -12,14 +12,14 @@
         <div class="container d-flex text-light flex-column flex-md-row justify-content-between">
             <a class="navbar-brand text-light font-weight-bold" href="/">MyCollegeHelper</a>
 
-            <#if !predmeti?has_content>
-                <form id="vpis_v_ucilnico">
-                    <label for="ucilnica">Spletna učilnica FRI:</label>
-                    <label for="ucilnica_mail"></label><input type="text" id="ucilnica_mail" name="mail" placeholder=" Uporabniški email">
-                    <label for="ucilnica_geslo"></label><input type="password" id="ucilnica_geslo" name="passwd" placeholder=" Geslo">
-<#--                    <button class="btn text-light btn-outline-secondary my-2 my-sm-0" type="submit" value="Submit">Prijava</button>-->
-                </form>
-            </#if>
+<#--            <#if !predmeti?has_content>-->
+<#--                <form id="vpis_v_ucilnico">-->
+<#--                    <label for="ucilnica">Spletna učilnica FRI:</label>-->
+<#--                    <label for="ucilnica_mail"></label><input type="text" id="ucilnica_mail" name="mail" placeholder=" Uporabniški email">-->
+<#--                    <label for="ucilnica_geslo"></label><input type="password" id="ucilnica_geslo" name="passwd" placeholder=" Geslo">-->
+<#--&lt;#&ndash;                    <button class="btn text-light btn-outline-secondary my-2 my-sm-0" type="submit" value="Submit">Prijava</button>&ndash;&gt;-->
+<#--                </form>-->
+<#--            </#if>-->
 
             <a class="btn text-light btn-outline-secondary my-2 my-sm-0" href="/logout">Logout</a>
         </div>
@@ -34,15 +34,15 @@
 
 
     <div class="row gh-1 gv-4 p-7">
-        <#if predmeti??>
-            <#list predmeti as x>
+        <#if subjects??>
+            <#list subjects as x>
                 <div class="col-12 col-md-6 col-lg-4 show-on-scroll show-on-scroll-ready mt-3" data-show-duration="500" data-show-distance="20" data-show-delay="50" style="transform: translateY(0px); transition-duration: 500ms; opacity: 1;">
-                    <a href="/subject/${x}" class="card card-demo bg-dark">
+                    <a href="/subject/${x.name}" class="card card-demo bg-dark">
                         <span class="card-img">
                             <img width="550" height="450" src="./images/notes2.png" alt="" style="padding-right: 100px;">
                         </span>
                         <span class="card-body">
-                            <span class="card-title h5 text-light-50">${x}</span>
+                            <span class="card-title h5 text-light-50">${x.name}</span>
                         </span>
                     </a>
                 </div>
