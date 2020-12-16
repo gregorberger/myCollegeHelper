@@ -22,6 +22,8 @@ public interface StudentService {
 
     SubjectsEntity getSubject(String subjectName);
 
+    ArrayList<SubjectsEntity> getAllSubjects();
+
     void insertGrade(GradesEntity grades);
 
     GradesEntity getGrade(String studentId, String subjectId);

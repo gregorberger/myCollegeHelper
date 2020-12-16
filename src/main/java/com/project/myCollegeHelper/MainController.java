@@ -34,6 +34,7 @@ import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.io.*;
+import java.lang.reflect.Array;
 import java.security.GeneralSecurityException;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
@@ -296,6 +297,13 @@ public class MainController {
 
         model.addAttribute("userName", userName);
         model.addAttribute("email", email);
+
+        // Za produkcijo
+        ArrayList<SubjectsEntity> subjects = studentService.getAllSubjects();
+        studentId = 1;
+        studentEmail = "gb5811@student.uni-lj.si";
+        model.addAttribute("subjects", subjects);
+        // Za produkcijo
 
         return "main";
     }

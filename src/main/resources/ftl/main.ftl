@@ -17,7 +17,7 @@
                     <label for="ucilnica">Spletna učilnica FRI:</label>
                     <label for="ucilnica_mail"></label><input type="text" id="ucilnica_mail" name="mail" placeholder=" Uporabniški email">
                     <label for="ucilnica_geslo"></label><input type="password" id="ucilnica_geslo" name="passwd" placeholder=" Geslo">
-                    <button class="btn text-light btn-outline-secondary my-2 my-sm-0" type="submit" value="Submit">Prijava</button>
+<#--                    <button class="btn text-light btn-outline-secondary my-2 my-sm-0" type="submit" value="Submit">Prijava</button>-->
                 </form>
             </#if>
 

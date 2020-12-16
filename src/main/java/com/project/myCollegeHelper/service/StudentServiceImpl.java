@@ -92,6 +92,12 @@ public class StudentServiceImpl extends JdbcDaoSupport implements StudentService
     }
 
     @Override
+    public ArrayList<SubjectsEntity> getAllSubjects() {
+        String sql = "select * from subjects";
+        return (ArrayList<SubjectsEntity>) getJdbcTemplate().query(sql, new SubjectsRowMapper());
+    }
+
+    @Override
     public void insertGrade(GradesEntity grades) {
         String sql = "select count(*) from grades where studentID = '"+ grades.getStudentId() + "' and subjectID = '"+ grades.getSubjectId() + "'";
         Integer rows = getJdbcTemplate().queryForObject(sql, Integer.class);
