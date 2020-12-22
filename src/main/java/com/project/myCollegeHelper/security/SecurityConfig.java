@@ -11,9 +11,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/oauth2/**", "/subject/**", "/grades/**","https://ucilnica.fri.uni-lj.si/**", "/student/**")
+                .antMatchers("/oauth2/**", "/subject/**", "/grades/**","https://ucilnica.fri.uni-lj.si/**", "/student/**", "/api/**")
                 .permitAll()
-                .antMatchers("/", "/subject/**", "/grades/**", "/student/**").authenticated()
+                .antMatchers("/", "/subject/**", "/grades/**", "/student/**", "/api/**").authenticated()
                 .anyRequest().permitAll()
                 .and()
                 .oauth2Login()
