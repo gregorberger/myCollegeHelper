@@ -14,6 +14,8 @@ Informacijski sistem bo sestavljen iz glavnega okna ki predstavlja koledar, ob s
 
 2. predmetnik: Pregled predmetov posameznega študenta, z možnostjo dodajanja zapiskov za posamezen predmet (tekst in slike). Nad predmetom bo ikona s številom koliko obveznosti še ima študent za ta predmet. Pri posameznem predmetu bi imel link do pregleda ocen vaj in drugih obveznosti pri tem predmetu.
 
+
+Dostop do produkcije: https://mycollegehelper-app.azurewebsites.net
 ===============================================================================
 
 Za zagon dockerjev znotraj projekta odpri terminal in vpisi:
