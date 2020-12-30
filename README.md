@@ -20,6 +20,10 @@ Dostop do produkcije: https://mycollegehelper-app.azurewebsites.net
 
 Dostop do dev: https://mycollegehelper-dev.azurewebsites.net
 
+Baza:
+![2020-12-30 17 02 28](https://i.imgur.com/tmvS6Ux.png)
+
+
 Za zagon dockerjev znotraj projekta odpri terminal in vpisi:
   1. docker-compose build
   2. docker-compose up
