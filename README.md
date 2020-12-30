@@ -16,6 +16,10 @@ Informacijski sistem bo sestavljen iz glavnega okna ki predstavlja koledar, ob s
 
 ===============================================================================
 
+Dostop do produkcije: https://mycollegehelper-app.azurewebsites.net
+
+Dostop do dev: https://mycollegehelper-dev.azurewebsites.net
+
 Za zagon dockerjev znotraj projekta odpri terminal in vpisi:
   1. docker-compose build
   2. docker-compose up
