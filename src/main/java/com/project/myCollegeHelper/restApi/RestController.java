@@ -33,4 +33,14 @@ public class RestController {
         }
         return studentService.getNotes(studentId, subjectId);
     }
+
+    @RequestMapping(value = "/subject/insertNote", method = RequestMethod.POST)
+    public SubjectNotesEntity insertNote(@RequestBody SubjectNotesEntity note, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (request.getHeader("apiKey") == null || !request.getHeader("apiKey").equals("apiSecret")) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Failed");
+        } else {
+            studentService.insertSubjectNote(note);
+        }
+        return note;
+    }
 }
