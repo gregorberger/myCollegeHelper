@@ -116,4 +116,11 @@ public class StudentServiceImpl extends JdbcDaoSupport implements StudentService
         return (GradesEntity) getJdbcTemplate().queryForObject(sql,new Object[]{studentId, subjectId},
                 new GradesRowMapper());
     }
+
+    @Override
+    public ArrayList<GradesEntity> getGradeByStudentId(String studentId) {
+        String sql = "select * from grades where studentID = ?";
+        return (ArrayList<GradesEntity>) getJdbcTemplate().query(sql,new Object[]{studentId},
+                new GradesRowMapper());
+    }
 }

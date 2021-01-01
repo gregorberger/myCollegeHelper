@@ -27,4 +27,6 @@ public interface StudentService {
     void insertGrade(GradesEntity grades);
 
     GradesEntity getGrade(String studentId, String subjectId);
+
+    ArrayList<GradesEntity> getGradeByStudentId(String studentId);
 }

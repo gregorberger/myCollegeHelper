@@ -43,6 +43,15 @@ public class RestController {
         return studentService.getGrade(studentId, subjectId);
     }
 
+    @RequestMapping(value = "/subject/getGradeByStudentId/{studentId}/", method = RequestMethod.GET)
+    ArrayList<GradesEntity> getGradeByStudentId(@PathVariable String studentId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (request.getHeader("apiKey") == null || !request.getHeader("apiKey").equals("apiSecret")) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Failed");
+        }
+        return studentService.getGradeByStudentId(studentId);
+    }
+
+
     @RequestMapping(value = "/subject/insertNote", method = RequestMethod.POST)
     public SubjectNotesEntity insertNote(@RequestBody SubjectNotesEntity note, HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (request.getHeader("apiKey") == null || !request.getHeader("apiKey").equals("apiSecret")) {
