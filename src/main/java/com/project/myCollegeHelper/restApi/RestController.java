@@ -1,5 +1,6 @@
 package com.project.myCollegeHelper.restApi;
 
+import com.project.myCollegeHelper.entity.GradesEntity;
 import com.project.myCollegeHelper.entity.SubjectNotesEntity;
 import com.project.myCollegeHelper.entity.SubjectsEntity;
 import com.project.myCollegeHelper.service.StudentServiceImpl;
@@ -32,6 +33,14 @@ public class RestController {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Failed");
         }
         return studentService.getNotes(studentId, subjectId);
+    }
+
+    @RequestMapping(value = "/subject/getGrade/{studentId}/{subjectId}", method = RequestMethod.GET)
+    GradesEntity getGrade(@PathVariable String studentId, @PathVariable String subjectId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (request.getHeader("apiKey") == null || !request.getHeader("apiKey").equals("apiSecret")) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Failed");
+        }
+        return studentService.getGrade(studentId, subjectId);
     }
 
     @RequestMapping(value = "/subject/insertNote", method = RequestMethod.POST)
