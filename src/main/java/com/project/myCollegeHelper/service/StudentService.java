@@ -14,6 +14,8 @@ public interface StudentService {
 
     void insertSubjectNote(SubjectNotesEntity note);
 
+    void deleteSubjectNote(String id);
+
     ArrayList<SubjectNotesEntity> getNotes(String studentId, String subjectId);
 
     SubjectNotesEntity getNote(String noteId);

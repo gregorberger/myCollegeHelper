@@ -46,17 +46,14 @@ public class StudentServiceImpl extends JdbcDaoSupport implements StudentService
 
     @Override
     public void insertSubjectNote(SubjectNotesEntity note) {
-        String sql = "select count(*) from subject_notes where title like '"+ note.getTitle() +"'";
-        Integer rows = getJdbcTemplate().queryForObject(sql, Integer.class);
-        // ce note iz titlom obstaja samo updejta notes text
-        if(rows != null && rows != 0) {
-            sql = "UPDATE subject_notes SET notes = '" + note.getNotes() + "' WHERE title = '"+ note.getTitle() +"';";
-            getJdbcTemplate().execute(sql);
-        } else {
-            sql = "INSERT INTO subject_notes " + "(studentID, subjectID, title, notes) VALUES (?, ?, ?,?)";
-            getJdbcTemplate().update(sql, note.getStudentId(), note.getSubjectId(), note.getTitle(), note.getNotes());
-        }
+        String sql = "INSERT INTO subject_notes " + "(studentID, subjectID, title, notes) VALUES (?, ?, ?,?)";
+        getJdbcTemplate().update(sql, note.getStudentId(), note.getSubjectId(), note.getTitle(), note.getNotes());
+    }
 
+    @Override
+    public void deleteSubjectNote(String id) {
+        String sql = "DELETE FROM subject_notes where id="+id;
+        getJdbcTemplate().update(sql);
     }
 
     @Override

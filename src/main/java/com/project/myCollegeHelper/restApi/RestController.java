@@ -1,6 +1,7 @@
 package com.project.myCollegeHelper.restApi;
 
 import com.project.myCollegeHelper.entity.GradesEntity;
+import com.project.myCollegeHelper.entity.SubjectNoteId;
 import com.project.myCollegeHelper.entity.SubjectNotesEntity;
 import com.project.myCollegeHelper.entity.SubjectsEntity;
 import com.project.myCollegeHelper.service.StudentServiceImpl;
@@ -60,5 +61,15 @@ public class RestController {
             studentService.insertSubjectNote(note);
         }
         return note;
+    }
+
+    @RequestMapping(value = "/subject/deleteNote", method = RequestMethod.POST)
+    public String deleteNote(@RequestBody SubjectNoteId subjectNoteId, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (request.getHeader("apiKey") == null || !request.getHeader("apiKey").equals("apiSecret")) {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Authentication Failed");
+        } else {
+            studentService.deleteSubjectNote(String.valueOf(subjectNoteId.getId()));
+        }
+        return String.valueOf(subjectNoteId.getId());
     }
 }
