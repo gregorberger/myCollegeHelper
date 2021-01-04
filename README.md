@@ -18,10 +18,22 @@ Informacijski sistem bo sestavljen iz glavnega okna ki predstavlja koledar, ob s
 
 Dostop do produkcije: https://mycollegehelper-app.azurewebsites.net
 
+Swagger: https://mycollegehelper-app.azurewebsites.net/swagger-ui.html
+
 Dostop do dev: https://mycollegehelper-dev.azurewebsites.net
 
 Baza:
 ![2020-12-30 17 02 28](https://i.imgur.com/tmvS6Ux.png)
+
+
+![2021-01-04 17 02 28](https://i.imgur.com/IfHkxhR.png)
+
+![2021-01-04 17 02 28](https://i.imgur.com/RiUPmNI.png)
+
+![2021-01-04 17 02 28](https://i.imgur.com/jwyWYaL.png)
+
+
+===============================================================================
 
 
 Za zagon dockerjev znotraj projekta odpri terminal in vpisi:
