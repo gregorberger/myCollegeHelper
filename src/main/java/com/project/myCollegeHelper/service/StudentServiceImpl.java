@@ -45,6 +45,12 @@ public class StudentServiceImpl extends JdbcDaoSupport implements StudentService
     }
 
     @Override
+    public ArrayList<StudentsEntity> getAllStudents() {
+        String sql = "select * from students";
+        return (ArrayList<StudentsEntity>) getJdbcTemplate().query(sql, new StudentRowMapper());
+    }
+
+    @Override
     public void insertSubjectNote(SubjectNotesEntity note) {
         String sql = "INSERT INTO subject_notes " + "(studentID, subjectID, title, notes) VALUES (?, ?, ?,?)";
         getJdbcTemplate().update(sql, note.getStudentId(), note.getSubjectId(), note.getTitle(), note.getNotes());

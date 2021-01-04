@@ -12,6 +12,8 @@ public interface StudentService {
 
     StudentsEntity getStudentByEmail(String email);
 
+    ArrayList<StudentsEntity> getAllStudents();
+
     void insertSubjectNote(SubjectNotesEntity note);
 
     void deleteSubjectNote(String id);
