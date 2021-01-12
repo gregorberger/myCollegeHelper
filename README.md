@@ -43,7 +43,7 @@ Baza:
 
 ![2021-01-012 20 54 00](https://i.imgur.com/4vQQLbG.png)
 
-(https://i.imgur.com/Fo5PQZl.png)
+![2021-01-012 20 55 00](https://i.imgur.com/Fo5PQZl.png)
 
 
 
