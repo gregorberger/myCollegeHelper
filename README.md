@@ -14,6 +14,15 @@ Informacijski sistem bo sestavljen iz glavnega okna ki predstavlja koledar, ob s
 
 2. predmetnik: Pregled predmetov posameznega študenta, z možnostjo dodajanja zapiskov za posamezen predmet (tekst in slike). Nad predmetom bo ikona s številom koliko obveznosti še ima študent za ta predmet. Pri posameznem predmetu bi imel link do pregleda ocen vaj in drugih obveznosti pri tem predmetu.
 
+
+Ideja za to nalogo:
+
+MyCollegeHelper je aplikacija, namenjena za študente, ki uporabljajo spletne učilnice Moodle. Razčlenjena je na dva dela – aplikacijo na telefonu in spletno aplikacijo, ki sta med seboj sinhronizirani. Uporabnik lahko tako dostopa do svojih ocen in zapiskov preko telefona kot tudi preko računalnika.
+
+Za izdelavo te aplikacije sva se odločila, ker sva kot študenta imela težave pri upravljanju obveznosti, saj spletna učilnica ni omogočila nobenih obvestil o koncu posameznih obveznosti. Kot dopolnilo sva imela idejo o ustvarjanju svojih zapiskov med predavanji, ki so potem shranjeni na enem mestu in lahko dostopni tako iz računalnika kot iz mobilnega telefona.
+
+Potrudila sva se, da sva naredila uporabniku čim bolj prijazen vmesnik in design obeh aplikacij. V izdelavi aplikacij naju je vodil predvsem cilj uporabnosti.
+
 ===============================================================================
 
 Dostop do produkcije: https://mycollegehelper-app.azurewebsites.net
@@ -31,6 +40,14 @@ Baza:
 ![2021-01-04 17 02 28](https://i.imgur.com/RiUPmNI.png)
 
 ![2021-01-04 17 02 28](https://i.imgur.com/jwyWYaL.png)
+
+![2021-01-012 20 54 00](https://i.imgur.com/4vQQLbG.png)
+
+(https://i.imgur.com/Fo5PQZl.png)
+
+
+
+
 
 
 ===============================================================================
