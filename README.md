@@ -23,6 +23,16 @@ Za izdelavo te aplikacije sva se odločila, ker sva kot študenta imela težave 
 
 Potrudila sva se, da sva naredila uporabniku čim bolj prijazen vmesnik in design obeh aplikacij. V izdelavi aplikacij naju je vodil predvsem cilj uporabnosti.
 
+
+SPLETNA APLIKACIJA
+
+Spletna aplikacija deluje na principu prijave v Google račun, da lahko uporabnik dostopa do svojega Google koledarja. Ko je prijava v Google račun uspešna, se prikaže domač zaslon spletne aplikacije MyCollegeHelper. Pričaka ga njegov koledar in možnost prijave v spletno učilnico Moodle. Po uspešni prijavi v učilnico, se mu v koledarju prikažejo obveznosti. Možnost pogleda svojih obveznosti je dnevna, tedenska in mesečna. Pod koledarjem se nahajajo njegovi predmeti, ki vsebujejo ocene in zapiske.
+
+
+MOBILNA APLIKACIJA
+
+Mobilna aplikacija je narejena tako, da prikaže vpisno polje, preko katerega dostopa do podatkov v bazi. Po vpisu in kliku na gumb se prikažejo predmeti, na katere lahko uporabnik tudi klikne. Zraven gumba za prikaz predmetov se nahaja gumb za prikaz vseh ocen.
+
 ===============================================================================
 
 Dostop do produkcije: https://mycollegehelper-app.azurewebsites.net
